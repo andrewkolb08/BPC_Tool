@@ -20,7 +20,10 @@ class MainWindow(QtGui.QDialog):
     
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+        flags = QtCore.Qt.Window | QtCore.Qt.WindowMinimizeButtonHint | QtCore.Qt.WindowCloseButtonHint
+        self.setWindowFlags(flags)
         #Find a way to have a minimize button here?
+        #Just did, bro.  see the setWindowFlags above
         self.completed = 0
         self.bpDlg = bpInput.BiteplateInput()
         self.img = QtGui.QLabel('<b> Instructions </b>')

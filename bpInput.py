@@ -14,7 +14,7 @@ class BiteplateInput(QtGui.QWidget):
     def __init__(self, parent = None):
         super(BiteplateInput,self).__init__(parent)
         
-        self.currentFile = None
+        self.currentFile  = None
         bpInfoLabel = QtGui.QLabel('<b>Biteplate File Information</b>')
         inputInfoLabel = QtGui.QLabel('<b>Input File Information</b>')
         outputInfoLabel = QtGui.QLabel('<b>Output File Information</b>')
@@ -89,6 +89,7 @@ class BiteplateInput(QtGui.QWidget):
                 self.outputEdit.setText(dirToSaveIn)
             elif who is 'source':
                 self.inputEdit.setText(dirToSaveIn)
+        self.currentFile = str(dirToSaveIn)
              
     def selectBPFile(self):
         dir = os.path.dirname(unicode(self.currentFile)) \
@@ -100,6 +101,7 @@ class BiteplateInput(QtGui.QWidget):
             return
         else:
             self.bpFileEdit.setText(bpfile)
+        self.currentFile = os.path.dirname(str(bpfile))
             
     def validateInput(self, data):
         
