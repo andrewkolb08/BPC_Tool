@@ -44,7 +44,6 @@ class MainWindow(QtGui.QDialog):
         finalLayout = QtGui.QVBoxLayout()
         finalLayout.addLayout(topLayout)
         finalLayout.addLayout(bottomLayout)
-        
         #Create a status label that gets updated with a qstatus bar on each iteration.. Also!
         #Disable the correct button when we are correcting, and reimplement the close event so
         #The user doesn't crap it up by exiting during correction.  Maybe add a cancel button
@@ -69,7 +68,7 @@ class MainWindow(QtGui.QDialog):
         self.progressLabel.setText('Initializing...')
         self.progressBar.setValue(1)
         files = glob.glob(indir+'/*.tsv')
-        OS, rot = bpUtils.BiteplateUtils.getRotation(bpfile, osCol, msCol)
+        OS, rot = bpUtils.BiteplateUtils.getRotation(bpfile, osCol, msCol) 
         self.progressBar.setValue(2)
         self.numFiles = len(files)
         self.thread = QtCore.QThread()

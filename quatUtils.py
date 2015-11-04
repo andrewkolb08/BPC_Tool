@@ -27,10 +27,15 @@ class QuatUtils():
             q1 = np.matrix(q1)
             q2 = np.matrix(q2)
             
+        numq1 = np.shape(np.matrix(q1))[0]
+        numq2 = np.shape(np.matrix(q2))[0]
+        
         prod1 = np.array([np.multiply(-q1[:,1],q2[:,1]), np.multiply(q1[:,1],q2[:,0]), np.multiply(-q1[:,1],q2[:,3]), np.multiply(q1[:,1],q2[:,2]) ])
         prod2 = np.array([np.multiply(-q1[:,2],q2[:,2]), np.multiply(q1[:,2],q2[:,3]), np.multiply(q1[:,2],q2[:,0]), np.multiply(-q1[:,2],q2[:,1]) ])
         prod3 = np.array([np.multiply(-q1[:,3],q2[:,3]), np.multiply(-q1[:,3],q2[:,2]), np.multiply(q1[:,3],q2[:,1]), np.multiply(q1[:,3],q2[:,0]) ])
         prod4 = np.array([np.multiply(q1[:,0],q2[:,0]),  np.multiply(q1[:,0],q2[:,1]), np.multiply(q1[:,0],q2[:,2]), np.multiply(q1[:,0],q2[:,3]) ])
+
+   
         
         qout = prod1+prod2+prod3+prod4
         qout[qout == -0.] = 0
@@ -119,11 +124,32 @@ class QuatUtils():
         
     @staticmethod
     def correctQuat(inQuat,rotation):
-        baseline = np.array([0,0,-1])
-        origNormVec = QuatUtils.qvqc(inQuat, baseline)
-        oldZ = np.array([0,0,1])
-        newZ = QuatUtils.qcvq(rotation,oldZ)
-        bpcQuat = QuatUtils.getQuat(newZ,origNormVec)
+        qflip = np.array([0, np.sqrt(2)/2, np.sqrt(2)/2, 0])
+        qflipped = QuatUtils.qmult(qflip,inQuat)
+        del inQuat
+        numQuats = np.size(qflipped,0)
+        bpcQuat = np.zeros(np.shape(qflipped))
+        #Make this work... break the inQuat matrix into 2000 at a time
+        #Do these in batch, until you get to the end, where there will be some
+        #left over.
+        #We need a counter to keep track of how many are left
+        #NOTE: Fix this in the actual function for future use.. when you have time
+        #If qmult detects too many quaternions, then handle it there.  for now, handle it here.
+        maxNum = 2000
+        if numQuats < maxNum:
+            bpcQuat = QuatUtils.qmult(rotation,qflipped)
+        else:
+            j=numQuats
+            while(j>maxNum):
+                inds2get = range((numQuats-j),(numQuats-j+maxNum))
+                toCorrect = np.matrix(qflipped[inds2get,:])
+                bpcQuat[inds2get,:]=QuatUtils.qmult(rotation,toCorrect)
+                j-=maxNum
+            #now clean up the leftovers
+            remaining=j+maxNum
+            toCorrect = np.matrix(qflipped[numQuats-remaining:-1,:])
+            bpcQuat[numQuats-remaining:-1,:]=QuatUtils.qmult(rotation,toCorrect)
+            
         return bpcQuat
         
 if __name__ == "__main__":

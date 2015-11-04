@@ -1,6 +1,6 @@
 # -*- mode: python -*-
 a = Analysis(['BPCMain.py'],
-             pathex=['C:\\Kolb Thesis Code\\BPCTool\\BPC_Tool'],
+             pathex=['C:\\Kolb Thesis Code\\BPCTool'],
              hiddenimports=[],
              hookspath=None,
              runtime_hooks=None)
