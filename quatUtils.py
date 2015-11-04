@@ -16,12 +16,19 @@ class QuatUtils():
     def qmult(q1,q2):
         numq1 = np.shape(np.matrix(q1))[0]
         numq2 = np.shape(np.matrix(q2))[0]
+        #Goofy error here.. if both aren't matrices, then the multiplication gets broadcasted over
+        #Multiple dimensions... meaning a quat that is 1000 by 4 produces an output of 1000 by 1000 by 4
+        #Stupid.
+        q1 = np.matrix(q1)
+        q2= np.matrix(q2)
         
         if (numq1 != numq2):
             if( numq1 == 1):
                 q1 = np.tile(q1,(numq2,1))
+
             else:
                 q2 = np.tile(q2,(numq1,1))
+
 
         else:       #Both are 1
             q1 = np.matrix(q1)
@@ -146,9 +153,9 @@ class QuatUtils():
                 bpcQuat[inds2get,:]=QuatUtils.qmult(rotation,toCorrect)
                 j-=maxNum
             #now clean up the leftovers
-            remaining=j+maxNum
-            toCorrect = np.matrix(qflipped[numQuats-remaining:-1,:])
-            bpcQuat[numQuats-remaining:-1,:]=QuatUtils.qmult(rotation,toCorrect)
+            remaining=j
+            toCorrect = np.matrix(qflipped[numQuats-remaining:,:])
+            bpcQuat[numQuats-remaining:,:]=QuatUtils.qmult(rotation,toCorrect)
             
         return bpcQuat
         
