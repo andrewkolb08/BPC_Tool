@@ -20,9 +20,10 @@ class BiteplateUtils():
         offset = np.array([-4,-1, 0])
         rawdat, header = BiteplateUtils.loadTsv(fileToCorrect)
         
-        numSensors = int(np.floor(rawdat.shape[1]/9))
+        numSensors = int(np.floor((rawdat.shape[1]-3)/9))
         swapDat= rawdat.copy()
-        for j in range(1,numSensors-1):
+        #AJK update 2/21/2016
+        for j in range(1,numSensors):
             #Position values swapped
             swapDat[:,5+9*j] = rawdat[:,6+9*j]
             swapDat[:,6+9*j] = rawdat[:,5+9*j]
@@ -31,11 +32,11 @@ class BiteplateUtils():
             #Quaternion values swapped
             swapDat[:,9+9*j] = rawdat[:,10+9*j]
             swapDat[:,10+9*j] = rawdat[:,9+9*j]
-            swapDat[:,12+9*j] = -rawdat[:,11+9*j]
+            swapDat[:,11+9*j] = -rawdat[:,11+9*j]
             
         BPCorrect = swapDat
             
-        for j in range(1,numSensors-1): 
+        for j in range(1,numSensors): 
             BPCorrect[:,5+9*j:8+9*j] = q.qvqc(rot,(swapDat[:,5+9*j:8+9*j]-OS))-offset
             BPCorrect[:,8+9*j:12+9*j] = q.correctQuat(swapDat[:,8+9*j:12*9+j], rot)
             BPCorrect[:,3+9*j] = j
