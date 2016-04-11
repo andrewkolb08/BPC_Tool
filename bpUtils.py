@@ -22,18 +22,6 @@ class BiteplateUtils():
         
         numSensors = int(np.floor((rawdat.shape[1]-3)/9))
         swapDat= rawdat.copy()
-        #AJK update 2/21/2016
-        for j in range(1,numSensors):
-            #Position values swapped
-            swapDat[:,5+9*j] = rawdat[:,6+9*j]
-            swapDat[:,6+9*j] = rawdat[:,5+9*j]
-            swapDat[:,7+9*j] = -rawdat[:,7+9*j]
-             
-            #Quaternion values swapped
-            swapDat[:,9+9*j] = rawdat[:,10+9*j]
-            swapDat[:,10+9*j] = rawdat[:,9+9*j]
-            swapDat[:,11+9*j] = -rawdat[:,11+9*j]
-            
         BPCorrect = swapDat
             
         for j in range(1,numSensors): 
@@ -42,9 +30,6 @@ class BiteplateUtils():
             BPCorrect[:,3+9*j] = j
         
         return BPCorrect, header
-                    #To complete:  Write a BPCFolder method that calls all of these functions to correct the contents of an entire folder.
-                #  Also, start by writing a writetsv method that makes the output data look less crappy, (copy dr. j's writetsv in matlab)
-        #PROBLEM IN OLD MATLAB WRITE TSV>>  FFIRST IS WRITE %6.F INSTEAD OF %.6F  that's why the number comes out as an integer.. doh.
 
     @staticmethod
     def writetsv(data, header, infile, outdir, numDec):
@@ -70,9 +55,9 @@ class BiteplateUtils():
         os = rawdat[:,(osCol):(osCol+3)]
         ms = rawdat[:,(msCol):(msCol+3)]
 
-        #Rearrange the columns
-        os = np.column_stack((os[:,1],os[:,0],-os[:,2]))
-        ms = np.column_stack((ms[:,1],ms[:,0],-ms[:,2]))
+        #We don't rearrange the columns anymore.
+        #os = np.column_stack((os[:,1],os[:,0],-os[:,2]))
+        #ms = np.column_stack((ms[:,1],ms[:,0],-ms[:,2]))
         
         MS = np.nanmean(ms,axis=0)
         OS = np.nanmean(os,axis=0)
