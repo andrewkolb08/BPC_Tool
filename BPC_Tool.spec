@@ -1,6 +1,6 @@
 # -*- mode: python -*-
 a = Analysis(['BPCMain.py'],
-             pathex=['C:\\Kolb Thesis Code\\BPCTool'],
+             pathex=['E:\\Users\\SpeechLab\\Documents\\GitHub\\BPC_Tool'],
              hiddenimports=[],
              hookspath=None,
              runtime_hooks=None)
