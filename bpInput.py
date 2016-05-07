@@ -39,10 +39,10 @@ class BiteplateInput(QtGui.QWidget):
         
         self.osBox = QtGui.QSpinBox()
         self.osBox.setRange(1,16)
-        self.osBox.setValue(2)
+        self.osBox.setValue(10)
         self.msBox = QtGui.QSpinBox()
         self.msBox.setRange(1,16)
-        self.msBox.setValue(3)
+        self.msBox.setValue(11)
         
         
         bpFileBrowseButton = QtGui.QPushButton('Browse...')
