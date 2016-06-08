@@ -67,7 +67,7 @@ class MainWindow(QtGui.QDialog):
         self.correctButton.setEnabled(False)
         self.progressLabel.setText('Initializing...')
         self.progressBar.setValue(1)
-        files = glob.glob(indir+'/*.tsv')
+        files = [fn for fn in glob.glob(indir+'/*.tsv') if "_BPC" not in fn]
         OS, rot = bpUtils.BiteplateUtils.getRotation(bpfile, osCol, msCol) 
         self.progressBar.setValue(2)
         self.numFiles = len(files)
