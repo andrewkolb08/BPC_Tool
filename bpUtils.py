@@ -21,12 +21,12 @@ class BiteplateUtils():
         rawdat, header = BiteplateUtils.loadTsv(fileToCorrect)
         
         numSensors = int(np.floor((rawdat.shape[1]-3)/9))
-        swapDat= rawdat.copy()
+        swapDat = rawdat.copy()
         BPCorrect = swapDat
             
         for j in range(1,numSensors): 
             BPCorrect[:,5+9*j:8+9*j] = q.qvqc(rot,(swapDat[:,5+9*j:8+9*j]-OS))-offset
-            BPCorrect[:,8+9*j:12+9*j] = q.correctQuat(swapDat[:,8+9*j:12*9+j], rot)
+            BPCorrect[:,8+9*j:12+9*j] = q.correctQuat(swapDat[:,8+9*j:12+9*j], rot)
             BPCorrect[:,3+9*j] = j
         
         return BPCorrect, header
