@@ -33,9 +33,9 @@ class BiteplateInput(QtGui.QWidget):
         self.bpFileEdit = QtGui.QLineEdit('')
         self.inputEdit = QtGui.QLineEdit('')
         self.outputEdit = QtGui.QLineEdit('')
-        self.bpFileEdit.setReadOnly(True)
-        self.inputEdit.setReadOnly(True)
-        self.outputEdit.setReadOnly(True)        
+        # self.bpFileEdit.setReadOnly(True)
+        # self.inputEdit.setReadOnly(True)
+        # self.outputEdit.setReadOnly(True)        
         
         self.osBox = QtGui.QSpinBox()
         self.osBox.setRange(1,16)
