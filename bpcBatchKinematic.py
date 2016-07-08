@@ -3,7 +3,7 @@ import bpUtils
 import os
 import numpy as np
 import glob
-import tkinter as tk
+import Tkinter as tk
 import tkFileDialog
 
 def main():
@@ -11,6 +11,7 @@ def main():
     root.withdraw()
     rootDir = tkFileDialog.askdirectory() + '\\'
     bpDir = '\\Calibration\\BitePlate\\'
+    palDir = '\\Calibration\\Palate\\'
     rawDir = '\\Kinematic\\Raw\\'
     corDir = '\\Kinematic\\Corrected\\'
     folds = os.listdir(rootDir)
@@ -18,17 +19,22 @@ def main():
     osCol = 86
     msCol = 95
     decPrec = 4
-    #folds = folds[:1]
     
     for f in folds:
         if f.startswith(num):
+            print "Processing " + f + "..."
             subFold = rootDir + f + bpDir
             bpfiles = [fn for fn in glob.glob(subFold+'/*biteplate*.tsv') if "_BPC" not in fn]
-            bpfile = bpfiles[-1]
+            bpfile = bpfiles[-1]    # Uses the "last" BP file (in the event of something like bpfile_2.tsv)
             indir = rootDir + f + rawDir
             outdir = rootDir + f + corDir
             files = glob.glob(indir+'/*.tsv')
             OS, rot = bpUtils.BiteplateUtils.getRotation(bpfile, osCol, msCol)
+            processFiles(OS, rot, indir, outdir, decPrec, files)
+            # Now do the palate traces
+            indir = rootDir + f + palDir
+            outdir = indir
+            files = [fn for fn in glob.glob(indir+'/*.tsv') if "_BPC" not in fn]
             processFiles(OS, rot, indir, outdir, decPrec, files)
             print f + " done."
             
