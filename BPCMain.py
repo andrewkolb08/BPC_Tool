@@ -68,7 +68,8 @@ class MainWindow(QtGui.QDialog):
         self.progressLabel.setText('Initializing...')
         self.progressBar.setValue(1)
         files = [fn for fn in glob.glob(indir+'/*.tsv') if "_BPC" not in fn]
-        OS, rot = bpUtils.BiteplateUtils.getRotation(bpfile, osCol, msCol) 
+        OS, rot = bpUtils.BiteplateUtils.getRotation(bpfile, osCol, msCol)
+        bpUtils.BiteplateUtils.saveRot(OS, rot, bpfile)
         self.progressBar.setValue(2)
         self.numFiles = len(files)
         self.thread = QtCore.QThread()

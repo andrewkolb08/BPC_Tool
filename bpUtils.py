@@ -124,6 +124,22 @@ class BiteplateUtils():
         data = np.genfromtxt(unicode(kinfilename), skip_header=1, delimiter = '\t')
         header = np.genfromtxt(unicode(kinfilename),skip_footer=np.shape(data)[0],delimiter = '\t', dtype = object)
         return data, header
+
+    @staticmethod
+    def saveRot(OS, rot, infile):
+        """
+            Saves the OS and rotation values (calculated in bpUtils.BiteplateUtils.getRotation) to .txt files 
+			in the same directory as the biteplate file.  
+			Filenames will be in the form of [subj]_biteplate_OS.txt and [subj]_biteplate_Rotation.txt
+        """
+        fname = os.path.split(infile)
+        name, ext = os.path.splitext(fname[1])
+        outdir = os.path.dirname(infile)
+        osName = os.path.join(outdir,name+'_OS.txt')
+        rotName = os.path.join(outdir,name+'_Rotation.txt')
+        np.savetxt(osName, OS, delimiter = '\t')
+        np.savetxt(rotName, rot, delimiter = '\t')
+        # nothing returned
         
 if(__name__ == '__main__'):
 
