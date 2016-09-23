@@ -15,7 +15,7 @@ class BiteplateUtils():
         pass
     
     @staticmethod
-    def correctData(fileToCorrect, OS, rot):
+    def correctData(fileToCorrect, OS, rot, resamp, freq):
         
         offset = np.array([-4,-1, 0])
         rawdat, header = BiteplateUtils.loadTsv(fileToCorrect)
@@ -28,6 +28,9 @@ class BiteplateUtils():
             BPCorrect[:,5+9*j:8+9*j] = q.qvqc(rot,(swapDat[:,5+9*j:8+9*j]-OS))-offset
             BPCorrect[:,8+9*j:12+9*j] = q.correctQuat(swapDat[:,8+9*j:12+9*j], rot)
             BPCorrect[:,3+9*j] = j
+        
+        if resamp:
+            BPCorrect = BiteplateUtils.resample(BPCorrect, freq)
         
         return BPCorrect, header
 
@@ -141,6 +144,45 @@ class BiteplateUtils():
         np.savetxt(rotName, rot, delimiter = '\t')
         # nothing returned
         
+    @staticmethod
+    def resample(rawdat, freq):
+        # The columns containing whole-number data ('MeasId', 'WavId', 'Sensor # Id', 'Sensor # Status', etc.)
+        rnd = [1,2,3,4,12,13,21,22,30,31,39,40,48,49,57,58]
+        
+        
+        # Checks for "error rows" at the beginning of the file.
+        # Error rows will have time values in the hundreds of thousands of seconds
+        row = 0
+        while rawdat[row,0] > 10:
+            row = row + 1
+        
+        rawdat = rawdat[row:,:]
+        
+        
+        # Generates a sequence from the first to last sample times evenly spaced at the frequency given
+        x = np.arange(rawdat[0,0], rawdat[-1,0], (1.0/freq))
+        
+        
+        # An empty array which will later hold the new, interpolated values.
+        # Note: np.empty generates an array filled with very tiny (on the order of e-292),
+        # but still non-zero values. To ensure that the random values aren't potentially
+        # mistaken as actual data, all values are set to 'nan' (a.k.a. 'NA').
+        newdat = np.empty([len(x), len(rawdat[0])]) * np.nan
+        
+        
+        # Performs a linear interpolation on each column
+        for i in range(len(rawdat[0])):
+            newdat[:,i] = np.interp(x, rawdat[:,0], rawdat[:,i])
+        
+        
+        # Rounds the previously mentioned whole-number columns back to whole numbers, mainly for aesthetics
+        for r in rnd:
+            newdat[:,r] = np.round(newdat[:,r], 0)
+
+        
+        # Returns the resampled data
+        return newdat
+    
 if(__name__ == '__main__'):
 
     bpfile =  "01_MANB_F_biteplate.tsv"
