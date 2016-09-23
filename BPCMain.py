@@ -13,7 +13,7 @@ from PyQt4 import QtCore, QtGui
 import glob
 import time
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 
 class MainWindow(QtGui.QDialog):
@@ -26,17 +26,20 @@ class MainWindow(QtGui.QDialog):
         #Just did, bro.  see the setWindowFlags above
         self.completed = 0
         self.bpDlg = bpInput.BiteplateInput()
-        self.img = QtGui.QLabel('<b> Instructions </b>')
+        # self.img = QtGui.QLabel('<b> Instructions </b>')
         self.correctButton = QtGui.QPushButton('Correct All')
         self.progressBar = QtGui.QProgressBar()
         self.progressBar.setRange(0,100)
         self.progressLabel = QtGui.QLabel('Idle')
         
         topLayout = QtGui.QHBoxLayout()
-        topLayout.addWidget(self.img)
+        # topLayout.addWidget(self.img)
         topLayout.addWidget(self.bpDlg)
+        topLayout.addStretch()
+        
         bottomLayout = QtGui.QHBoxLayout()
         bottomLayout.addStretch()
+        bottomLayout.insertSpacing(2,-250)
         bottomLayout.addWidget(self.progressLabel)
         bottomLayout.addWidget(self.progressBar)
         bottomLayout.addWidget(self.correctButton)
@@ -58,9 +61,10 @@ class MainWindow(QtGui.QDialog):
         if(userInput is not None):
             self.processAllFiles(userInput[0],userInput[1],
                                                    userInput[2],userInput[3],
-                                                   userInput[4],userInput[5])
+                                                   userInput[4],userInput[5],
+                                                   userInput[6],userInput[7])
                    
-    def processAllFiles(self,bpfile, osNum, msNum, indir, outdir, decPrec):
+    def processAllFiles(self,bpfile, osNum, msNum, indir, outdir, decPrec, resamp, freq):
         osCol = 5+(osNum-1)*9
         msCol = 5+(msNum-1)*9        
         
@@ -68,11 +72,12 @@ class MainWindow(QtGui.QDialog):
         self.progressLabel.setText('Initializing...')
         self.progressBar.setValue(1)
         files = [fn for fn in glob.glob(indir+'/*.tsv') if "_BPC" not in fn]
-        OS, rot = bpUtils.BiteplateUtils.getRotation(bpfile, osCol, msCol) 
+        OS, rot = bpUtils.BiteplateUtils.getRotation(bpfile, osCol, msCol)
+        bpUtils.BiteplateUtils.saveRot(OS, rot, bpfile)
         self.progressBar.setValue(2)
         self.numFiles = len(files)
         self.thread = QtCore.QThread()
-        self.worker = Worker(OS, rot, indir, outdir, decPrec, files)
+        self.worker = Worker(OS, rot, indir, outdir, decPrec, files, resamp, freq)
         
         self.worker.moveToThread(self.thread)
 #        self.thread.connect(QtCore.SIGNAL('started()'), self.worker.processFiles())                
@@ -116,7 +121,7 @@ class MainWindow(QtGui.QDialog):
         
 class Worker(QtCore.QObject):   
     
-    def __init__(self, OS, rot, indir, outdir, decPrec, files, parent = None):
+    def __init__(self, OS, rot, indir, outdir, decPrec, files, resamp, freq, parent = None):
         super(Worker, self).__init__(parent)
         self.OS = OS
         self.rot = rot
@@ -124,11 +129,13 @@ class Worker(QtCore.QObject):
         self.outdir = outdir
         self.decPrec = decPrec
         self.files = files
+        self.resamp = resamp
+        self.freq = freq
         
     @QtCore.pyqtSlot()
     def processFiles(self):
         for f in self.files:
-            data, header = bpUtils.BiteplateUtils.correctData(f, self.OS, self.rot)
+            data, header = bpUtils.BiteplateUtils.correctData(f, self.OS, self.rot, self.resamp, self.freq)
             bpUtils.BiteplateUtils.writetsv(data, header, f, self.outdir, self.decPrec)
             self.emit(QtCore.SIGNAL("finishedOne()"))
             

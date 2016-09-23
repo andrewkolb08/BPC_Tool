@@ -18,12 +18,16 @@ class BiteplateInput(QtGui.QWidget):
         bpInfoLabel = QtGui.QLabel('<b>Biteplate File Information</b>')
         inputInfoLabel = QtGui.QLabel('<b>Input File Information</b>')
         outputInfoLabel = QtGui.QLabel('<b>Output File Information</b>')
+        resampInfoLabel = QtGui.QLabel('<b>Resampling Information</b>')
         bpLocationLabel = QtGui.QLabel('Biteplate File: ')
         osLabel = QtGui.QLabel('OS Sensor Number: ')
         msLabel = QtGui.QLabel('MS Sensor Number: ')
         sourceLabel = QtGui.QLabel('Input Folder: ')
         decimalLabel = QtGui.QLabel('Decimal Precision: ')
         sinkLabel = QtGui.QLabel('Output Folder: ')
+        resampLabel = QtGui.QLabel('Resample Data: ')
+        freqLabel = QtGui.QLabel('Desired Frequency: ')
+        freqUnits = QtGui.QLabel('Hz')
         
         self.decimalBox = QtGui.QSpinBox()
         self.decimalBox.setRange(3,9)
@@ -44,6 +48,11 @@ class BiteplateInput(QtGui.QWidget):
         self.msBox.setRange(1,16)
         self.msBox.setValue(11)
         
+        self.resampBox = QtGui.QCheckBox('')
+        self.resampBox.setCheckState(2)
+        self.freq = QtGui.QSpinBox()
+        self.freq.setRange(0,1000)
+        self.freq.setValue(400)
         
         bpFileBrowseButton = QtGui.QPushButton('Browse...')
         sourceBrowseButton = QtGui.QPushButton('Browse...')
@@ -68,6 +77,12 @@ class BiteplateInput(QtGui.QWidget):
         layout.addWidget(sinkBrowseButton,6,5,1,1)
         layout.addWidget(decimalLabel,7,1,1,1)
         layout.addWidget(self.decimalBox,7,2,1,1)
+        layout.addWidget(resampInfoLabel,8,1,1,2)
+        layout.addWidget(resampLabel,9,1)
+        layout.addWidget(self.resampBox,9,2,1,1)
+        layout.addWidget(freqLabel,9,3,1,4)
+        layout.addWidget(self.freq,9,4)
+        layout.addWidget(freqUnits,9,5)
         self.setLayout(layout)
         
         self.sourceBrowseCallback = lambda who="source": self.selectDir(who)
@@ -104,7 +119,6 @@ class BiteplateInput(QtGui.QWidget):
         self.currentFile = os.path.dirname(str(bpfile))
             
     def validateInput(self, data):
-        
         if '' in data:
             QtGui.QMessageBox.warning(self,'Invalid Input', 'No fields can be left empty')
             return False
@@ -122,7 +136,9 @@ class BiteplateInput(QtGui.QWidget):
         indir = unicode(self.inputEdit.text()).strip()
         outdir = unicode(self.outputEdit.text()).strip()
         decimal = self.decimalBox.value()
-        toReturn = (bpfile, int(osCol), int(msCol), indir, outdir, int(decimal))
+        resamp = self.resampBox.isChecked()
+        freq = self.freq.value()
+        toReturn = (bpfile, int(osCol), int(msCol), indir, outdir, int(decimal), resamp, int(freq))
         okay = self.validateInput(toReturn)
         
         if(okay):
